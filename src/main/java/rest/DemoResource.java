@@ -120,13 +120,13 @@ public class DemoResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("test")
+    @Path("catfactx")
     public Response test() throws IOException {
        return Response.ok().entity(GSON.toJson(getCatFact("https://catfact.ninja/fact"))).build();
     }
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("test2")
+    @Path("randomjokex")
     public Response test2() throws IOException {
         return Response.ok().entity(GSON.toJson(getCatFact("https://api.chucknorris.io/jokes/random"))).build();
     }
