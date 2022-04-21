@@ -130,7 +130,7 @@ public class DemoResource {
     public Response test2() throws IOException {
         return Response.ok().entity(GSON.toJson(getCatFact("https://api.chucknorris.io/jokes/random"))).build();
     }
-
+//d
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
