@@ -118,7 +118,13 @@ public class DemoResource {
         return "{\"msg\": \"cat fact: " + fact + "\"}";
     }
 
-
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("test")
+    public Response test() throws IOException {
+        String fact = HttpUtils.fetchData("https://catfact.ninja/fact");
+        return Response.ok().entity(GSON.toJson(fact)).build();
+    }
 
 
 
