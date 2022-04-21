@@ -112,39 +112,12 @@ public class DemoResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("topanimes")
-    public Response topanimes() {
-        return Response.ok().entity(GSON.toJson(getanimes())).build();
-
+    public String topanimes() throws IOException {
+        String anime = HttpUtils.fetchData("https://kitsu.io/api/edge/anime/1?fields[anime]=slug");
+        return "{\"msg\": \"topanimes: " + anime + "\"}";
     }
 
-    public JsonObject getanimes() {
-        try {
-            URL url = new URL("https://kitsu.io/api/edge/anime/1?fields[anime]=slug");//your url i.e fetch data from .
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("User-Agent", "server");
-            conn.setRequestProperty("Accept", "application/json;charset=UTF-8");
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP Error code : "
-                        + conn.getResponseCode());
-            }
-
-            Scanner sc = new Scanner(conn.getInputStream());
-            String json = null;
-            if (sc.hasNext()) {
-                json = sc.nextLine();
-            }
-            sc.close();
-            JsonObject temp = new Gson().fromJson(json, JsonObject.class);
-            conn.disconnect();
-            return temp;
-
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            String error_string = e.toString();
-            return new Gson().fromJson(error_string,JsonObject.class);
-        }
-    }
+    
 
 
     @GET
