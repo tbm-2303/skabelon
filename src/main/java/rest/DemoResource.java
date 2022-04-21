@@ -122,9 +122,14 @@ public class DemoResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("test")
     public Response test() throws IOException {
-       return Response.ok().entity(GSON.toJson(getCatFact())).build();
+       return Response.ok().entity(GSON.toJson(getCatFact("https://catfact.ninja/fact"))).build();
     }
-
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("test2")
+    public Response test2() throws IOException {
+        return Response.ok().entity(GSON.toJson(getCatFact("https://api.chucknorris.io/jokes/random"))).build();
+    }
 
 
     @GET
@@ -154,9 +159,9 @@ public class DemoResource {
 
 
 
-    public JsonObject getCatFact() {
+    public JsonObject getCatFact(String urls) {
         try {
-            URL url = new URL("https://catfact.ninja/fact");//your url i.e fetch data from .
+            URL url = new URL(urls);//your url i.e fetch data from .
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("User-Agent", "server");
