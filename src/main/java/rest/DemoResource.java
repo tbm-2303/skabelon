@@ -1,22 +1,27 @@
 package rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import entities.Role;
 import entities.User;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
+import java.util.Scanner;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.SecurityContext;
+
 import utils.EMF_Creator;
 import utils.HttpUtils;
 
@@ -27,6 +32,8 @@ import utils.HttpUtils;
 public class DemoResource {
     
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
     @Context
     private UriInfo context;
 
@@ -101,6 +108,44 @@ public class DemoResource {
         String joke = HttpUtils.fetchData("https://api.chucknorris.io/jokes/random");
         return "{\"msg\": \"Random Joke: " + joke + "\"}";
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("topanimes")
+    public Response topanimes() {
+        return Response.ok().entity(GSON.toJson(getanimes())).build();
+
+    }
+
+    public JsonObject getanimes() {
+        try {
+            URL url = new URL("https://kitsu.io/api/edge/anime/1?fields[anime]=slug");//your url i.e fetch data from .
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("User-Agent", "server");
+            conn.setRequestProperty("Accept", "application/json;charset=UTF-8");
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP Error code : "
+                        + conn.getResponseCode());
+            }
+
+            Scanner sc = new Scanner(conn.getInputStream());
+            String json = null;
+            if (sc.hasNext()) {
+                json = sc.nextLine();
+            }
+            sc.close();
+            JsonObject temp = new Gson().fromJson(json, JsonObject.class);
+            conn.disconnect();
+            return temp;
+
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+            String error_string = e.toString();
+            return new Gson().fromJson(error_string,JsonObject.class);
+        }
+    }
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
