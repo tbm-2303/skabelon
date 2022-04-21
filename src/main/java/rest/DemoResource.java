@@ -123,7 +123,7 @@ public class DemoResource {
     @Path("test")
     public Response test() throws IOException {
         String fact = HttpUtils.fetchData("https://catfact.ninja/fact");
-        return Response.ok().entity(GSON.toJson(fact)).build();
+        return Response.ok().entity(fact).build();
     }
 
 
