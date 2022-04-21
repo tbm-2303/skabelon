@@ -101,6 +101,7 @@ public class DemoResource {
         System.out.println("Created TEST Users");
         return "{\"msg\":\"setup all good\"}";
     }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("randomjoke")
