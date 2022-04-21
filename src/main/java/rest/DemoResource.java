@@ -1,7 +1,10 @@
 package rest;
 
 import com.google.gson.Gson;
+import entities.Role;
 import entities.User;
+
+import java.io.IOException;
 import java.util.List;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManager;
@@ -15,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import utils.EMF_Creator;
+import utils.HttpUtils;
 
 /**
  * @author lam@cphbusiness.dk
@@ -49,6 +53,53 @@ public class DemoResource {
         } finally {
             em.close();
         }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("setup")
+    public String setup(){
+
+        EntityManager em = EMF.createEntityManager();
+
+        // IMPORTAAAAAAAAAANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // This breaks one of the MOST fundamental security rules in that it ships with default users and passwords
+        // CHANGE the three passwords below, before you uncomment and execute the code below
+        // Also, either delete this file, when users are created or rename and add to .gitignore
+        // Whatever you do DO NOT COMMIT and PUSH with the real passwords
+
+        User user = new User("timmy", "timmy123");
+        User admin = new User("james", "james123");
+        User both = new User("kent", "kent123");
+
+        if(admin.getUserPass().equals("test")||user.getUserPass().equals("test")||both.getUserPass().equals("test"))
+            throw new UnsupportedOperationException("You have not changed the passwords");
+
+        em.getTransaction().begin();
+        Role userRole = new Role("user");
+        Role adminRole = new Role("admin");
+        user.addRole(userRole);
+        admin.addRole(adminRole);
+        both.addRole(userRole);
+        both.addRole(adminRole);
+        em.persist(userRole);
+        em.persist(adminRole);
+        em.persist(user);
+        em.persist(admin);
+        em.persist(both);
+        em.getTransaction().commit();
+        System.out.println("PW: " + user.getUserPass());
+        System.out.println("Testing user with OK password: " + user.verifyPassword("timmy123"));
+        System.out.println("Testing user with wrong password: " + user.verifyPassword("test1"));
+        System.out.println("Created TEST Users");
+        return "{\"msg\":\"setup all good\"}";
+    }
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("randomjoke")
+    public String getRandomJoke() throws IOException {
+        String joke = HttpUtils.fetchData("https://api.chucknorris.io/jokes/random");
+        return "{\"msg\": \"Random Joke: " + joke + "\"}";
     }
 
     @GET
