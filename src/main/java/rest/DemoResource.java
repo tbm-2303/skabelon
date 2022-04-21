@@ -111,13 +111,14 @@ public class DemoResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("topanimes")
-    public String topanimes() throws IOException {
-        String anime = HttpUtils.fetchData("https://kitsu.io/api/edge/anime/1?fields[anime]=slug");
-        return "{\"msg\": \"topanimes: " + anime + "\"}";
+    @Path("catfact")
+    public String catFact() throws IOException {
+        String fact = HttpUtils.fetchData("https://catfact.ninja/fact");
+        return "{\"msg\": \"cat fact: " + fact + "\"}";
     }
 
-    
+
+
 
 
     @GET
