@@ -22,6 +22,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
+import facades.UserFacade;
 import utils.EMF_Creator;
 import utils.HttpUtils;
 
@@ -33,6 +34,8 @@ public class DemoResource {
     
     private static final EntityManagerFactory EMF = EMF_Creator.createEntityManagerFactory();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final UserFacade FACADE = UserFacade.getUserFacade(EMF_Creator.createEntityManagerFactory());
+
 
     @Context
     private UriInfo context;
@@ -122,13 +125,13 @@ public class DemoResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("catfactx")
     public Response test() throws IOException {
-       return Response.ok().entity(GSON.toJson(getCatFact("https://catfact.ninja/fact"))).build();
+       return Response.ok().entity(GSON.toJson(FACADE.getRandomCatFact())).build();
     }
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("randomjokex")
-    public Response test2() throws IOException {
-        return Response.ok().entity(GSON.toJson(getCatFact("https://api.chucknorris.io/jokes/random"))).build();
+    public Response test2() {
+        return Response.ok().entity(GSON.toJson(FACADE.getRandomJoke())).build();
     }
 //d
 
@@ -159,27 +162,4 @@ public class DemoResource {
 
 
 
-    public JsonObject getCatFact(String urls) {
-        try {
-            URL url = new URL(urls);//your url i.e fetch data from .
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("User-Agent", "server");
-            conn.setRequestProperty("Accept", "application/json;charset=UTF-8");
-            if (conn.getResponseCode() != 200) {
-                throw new RuntimeException("Failed: HTTP Error code : " + conn.getResponseCode());
-            }
-            InputStreamReader in = new InputStreamReader(conn.getInputStream());
-            BufferedReader br = new BufferedReader(in);
-            String output = br.readLine();
-            JsonObject convertedObject = new Gson().fromJson(output, JsonObject.class);
-            conn.disconnect();
-            return convertedObject;
-
-        } catch (Exception e) {
-            System.out.println("Exception in NetClientGet:- " + e);
-            JsonObject error = new Gson().fromJson(new Gson().toJson(e), JsonObject.class);
-            return error;
-        }
-    }
 }

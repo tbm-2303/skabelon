@@ -1,9 +1,11 @@
 package facades;
 
+import com.google.gson.JsonObject;
 import entities.User;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import security.errorhandling.AuthenticationException;
+import utils.Utility;
 
 /**
  * @author lam@cphbusiness.dk
@@ -41,6 +43,14 @@ public class UserFacade {
             em.close();
         }
         return user;
+    }
+
+    public JsonObject getRandomCatFact() {
+        return Utility.fetchData("https://catfact.ninja/fact");
+    }
+
+    public JsonObject getRandomJoke() {
+        return Utility.fetchData("https://api.chucknorris.io/jokes/random");
     }
 
 }
