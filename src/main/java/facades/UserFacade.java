@@ -1,6 +1,7 @@
 package facades;
 
 import com.google.gson.JsonObject;
+import entities.Role;
 import entities.User;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -30,6 +31,10 @@ public class UserFacade {
         }
         return instance;
     }
+    private EntityManager getEntityManager() {
+        return emf.createEntityManager();
+    }
+
 
     public User getVeryfiedUser(String username, String password) throws AuthenticationException {
         EntityManager em = emf.createEntityManager();
@@ -53,4 +58,19 @@ public class UserFacade {
         return Utility.fetchData("https://api.chucknorris.io/jokes/random");
     }
 
+    //todo: make more facade methods for persisting and updating data.
+    public User create(User user) {
+        EntityManager em = getEntityManager();
+        Role role = em.find(Role.class, "user");
+        user.addRole(role);
+        try {
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
+
+        } finally {
+            em.close();
+        }
+        return user;
+    }
 }
